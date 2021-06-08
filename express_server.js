@@ -15,7 +15,7 @@ function generateRandomString() {
   randomString = '';
   let characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
   for (let i = 0; i < 6; i++ ) {
-    randomString += characters.charAt(Math.floor(Math.random*6));
+    randomString += characters.charAt(Math.floor(Math.random() * 62));
   }
   return randomString;
 }
@@ -38,8 +38,16 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
+  if (req) {
+    const newShortURL = generateRandomString();
+    urlDatabase[newShortURL] = {
+      longURL: req.body.longURL
+    }
+    res.redirect('/urls/' + newShortURL);
+  }
   console.log(req.body);  // Log the POST request body to the console
   res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  
 });
 
 
