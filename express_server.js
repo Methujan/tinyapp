@@ -14,6 +14,8 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+
+
 function generateRandomString() {
   randomString = '';
   let characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -54,6 +56,13 @@ app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
+
+app.get("/register", (req, res) => {
+  const templateVars = { 
+  username: req.cookies["username"],
+};
+  res.render('urls_register', templateVars)
+})
 
 
 
