@@ -70,18 +70,33 @@ const findIdFromEmail = function(email, users) {
   }
 }
 
-
+const urlsForUser = function(id) {
+  let userUrlDatabase = {};
+  for(let url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      userUrlDatabase[url] = urlDatabase[url];
+    }
+  }
+  return userUrlDatabase;
+}
+//Add get for '/' -> Homepage
 
 app.get("/urls", (req, res) => {
   let userID = req.cookies['user_id']
   let user = users[userID];
+  let userUrls = urlsForUser(userID);
   const templateVars = {
     'user': user, 
-    'urls': urlDatabase
+    'urls': urlDatabase,
+    userUrls,
   };
-  console.log('UserObject', user);
-  console.log('UserDatabase', users);
-  res.render("urls_index", templateVars);
+  //console.log('UserObject', user);
+  //console.log('UserDatabase', users);
+  if(userID) {
+    res.render("urls_index", templateVars);
+  } else {
+    res.status(400).send('Error 400: Login or Register to see your urls.')
+  }
 })
 
 
@@ -150,7 +165,6 @@ app.post("/urls", (req, res) => {
   res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
-
 //Delete
 app.post('/urls/:shortURL/delete', (req, res) => { // require and use method override, change delete in EJS Template 
   const shortURL = req.params.shortURL;
@@ -165,16 +179,13 @@ app.post('/urls/:shortURL', (req, res) => {
   res.redirect('/urls');
 })
 
-
-
-
 //login post
 app.post('/login', (req, res) => {
   let emailInput = req.body.email;
   let passwordInput = req.body.password;
-  if(checkForEmail(emailInput, users)) {
+  if (checkForEmail(emailInput, users)) {
     const idOfEmail = findIdFromEmail(emailInput, users)
-    if(passwordInput === users[idOfEmail].password) {
+    if (passwordInput === users[idOfEmail].password) {
       res.cookie('user_id', idOfEmail);
       res.redirect('/urls');
     } else {
@@ -191,10 +202,6 @@ app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
   res.redirect('/urls');
 })
-
-
-
-
 
 //register
 app.post('/register', (req, res) => {
