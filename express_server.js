@@ -100,8 +100,12 @@ app.get("/register", (req, res) => {
 })
 
 app.get("/login", (req, res) => {
-
-  res.render('urls_login')
+  let userID = req.cookies['user_id']
+  let user = users[userID];
+  const templateVars = {
+    'user': user, ///////problem
+  };
+  res.render('urls_login', templateVars)
 })
 
 

@@ -4,15 +4,27 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <title>Login</title>
 </head>
 <body>
+  <%- include('partials/_header')%>
+  <br>
+  <h1 style="padding:10px"><b>Login Into Your Account</b></h1>
+  <div style="text-align: left; padding:10px">
   <form action="/login" method='POST'>
-  <label for="email"  >Email</label>
-  <input type="email" name="email" id="email">
-  <label for="password">Password</label>
-  <input type="password" name="password" id="password">
-  <button type="submit">Submit</button>
+    <label for="email"  >Email Address</label>
+    <br>
+    <input type="email" name="email" id="email" style="width:250px" placeholder="Enter your Email Address">
+    <br>
+    <br>
+    <label for="password">Password</label>
+    <br>
+    <input type="password" name="password" id="password" style="width:250px" placeholder="Enter Your Password">
+    <br>
+    <br>
+    <button type="submit" class="btn btn-primary">Log In</button>
   </form>
+  </div>
 </body>
 </html>
