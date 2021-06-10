@@ -91,8 +91,11 @@ app.get('/', (req, res) => {
 
 app.get("/urls", (req, res) => {
   let userID = req.cookies['user_id']
+  console.log('userID',userID)
   let user = users[userID];
   let userUrls = urlsForUser(userID);
+  console.log('urlDatabase',urlDatabase);
+  console.log('userUrls',userUrls);
   const templateVars = {
     'user': user, 
     'urls': urlDatabase,
@@ -165,8 +168,10 @@ app.get("/login", (req, res) => {
 app.post("/urls", (req, res) => {
   if (req) {
     const newShortURL = generateRandomString();
+    const userID = req.cookies['user_id'];
     urlDatabase[newShortURL] = {
-      longURL: req.body.longURL
+      longURL: req.body.longURL,
+      userID: userID
     }
     res.redirect('/urls/' + newShortURL);
   }
