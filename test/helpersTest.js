@@ -1,6 +1,6 @@
 const { assert } = require('chai');
 
-const { getUserByEmail } = require('../helpers.js');
+const { getUserByEmail, generateRandomString, checkForEmail, findIdFromEmail } = require('../helpers.js');
 
 const testUsers = {
   "userRandomID": {
@@ -20,6 +20,25 @@ describe('getUserByEmail', function() {
     const user = getUserByEmail("user@example.com", testUsers)
     const expectedOutput = "userRandomID";
     assert.equal(user, expectedOutput)
-    // Write your assert statement here
   });
+
+  it('should return a length of 6 for the randomized string', function() {
+    const actual = generateRandomString()
+    const expectedOutput = 6;
+    assert.equal(actual.length, expectedOutput)
+  });
+  
+  it('should return true if inputted email is in the database', function() {
+    const actual = checkForEmail("user@example.com", testUsers)
+    const expectedOutput = true;
+    assert.equal(actual, expectedOutput)
+  });
+
+  it('should return ID given the email', function() {
+    const actual = findIdFromEmail("user@example.com", testUsers)
+    const expectedOutput = "userRandomID";
+    assert.equal(actual, expectedOutput)
+  });
+
+
 });
