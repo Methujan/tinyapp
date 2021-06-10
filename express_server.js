@@ -11,11 +11,21 @@ app.use(express.json());//
 app.use(express.urlencoded({ extended: false }));
 
 
-
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: { 
+    longURL: "https://www.tsn.ca", 
+    userID: "aJ48lW" 
+  },
+  i3BoGr: { 
+    longURL: "https://www.google.ca", 
+    userID: "aJ48lW" 
+  }
 };
+
+//const urlDatabase = {
+//  "b2xVn2": "http://www.lighthouselabs.ca",
+//  "9sm5xK": "http://www.google.com"
+//};
 
 const users = {
   "userRandomID": {
@@ -97,13 +107,13 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     'user': user,
     'shortURL': req.params.shortURL,
-    'longURL': urlDatabase[req.params.shortURL]
+    'longURL': urlDatabase[req.params.shortURL].longURL
   };
   res.render("urls_show", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
 
@@ -151,7 +161,7 @@ app.post('/urls/:shortURL/delete', (req, res) => { // require and use method ove
 //Update
 app.post('/urls/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = req.body.updatedURL;
+  urlDatabase[shortURL].longURL = req.body.updatedURL;
   res.redirect('/urls');
 })
 
