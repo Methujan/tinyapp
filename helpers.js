@@ -1,6 +1,6 @@
-const getUserByEmail = function(email, database) {
+const getUserByEmail = function(inputEmail, database) {
   for( let user in database) {
-    if (users[user].email === email) {
+    if (database[user].email === inputEmail) {
       return user;
     }
   }
