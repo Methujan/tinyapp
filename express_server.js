@@ -136,7 +136,9 @@ app.post('/urls/:shortURL', (req, res) => {
 
 const findIdFromEmail = function(email, users) {
   for( let user in users) {
-    
+    if (users[user].email === email) {
+      return users[user].id;
+    }
   }
 }
 
@@ -146,9 +148,13 @@ app.post('/login', (req, res) => {
   let emailInput = req.body.email;
   let passwordInput = req.body.password;
 
+  //console.log("req.body:",(req.body.password));
+  //console.log("emailinput:",(emailInput));
+  //console.log(checkForEmail(emailInput, users));
   if(checkForEmail(emailInput, users)) {
-    if(passwordInput === users[user].password) {
-      res.cookie('user_id', email);
+    const idOfEmail = findIdFromEmail(emailInput, users)
+    if(passwordInput === users[idOfEmail].password) {
+      res.cookie('user_id', idOfEmail);
       res.redirect('/urls');
     } else {
       res.status(403).send('Error 403: Passwords don\'t match.')
@@ -187,6 +193,7 @@ app.post('/register', (req, res) => {
       email: req.body.email,
       password: req.body.password
     }
+    console.log(users);
     res.cookie('user_id', newUserID)
     res.redirect('/urls')
   }
