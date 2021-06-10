@@ -9,20 +9,22 @@ app.use(cookieParser());//
 app.use(express.json());//
 app.use(express.urlencoded({ extended: false }));
 
+
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
-const users = { 
+const users = {
   "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
+    id: "userRandomID",
+    email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
     password: "dishwasher-funk"
   }
 }
@@ -32,30 +34,40 @@ const users = {
 function generateRandomString() {
   randomString = '';
   let characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-  for (let i = 0; i < 6; i++ ) {
+  for (let i = 0; i < 6; i++) {
     randomString += characters.charAt(Math.floor(Math.random() * 62));
   }
   return randomString;
 }
+
+//Callback function to check if email has already been register
+const checkForEmail = function(inputEmail, users){
+  for(user in users){
+    if(users[user].email === inputEmail){
+      return true;
+    }
+  }
+  return false;
+  }
 
 
 
 app.get("/urls", (req, res) => {
   let userID = req.cookies['user_id']
   let user = users[userID];
-  const templateVars = { 
+  const templateVars = {
     'user': user, ///////problem
-    'urls': urlDatabase 
+    'urls': urlDatabase
   };
-console.log('UserObject',user);
-console.log('UserDatabase',users);
+  console.log('UserObject', user);
+  console.log('UserDatabase', users);
   res.render("urls_index", templateVars);
 })
 
 app.get("/urls/new", (req, res) => {
   let userID = req.cookies['user_id']
   let user = users[userID];
-  const templateVars = { 
+  const templateVars = {
     'user': user, ///////problem
   };
   res.render("urls_new", templateVars);
@@ -64,9 +76,9 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   let userID = req.cookies['user_id']
   let user = users[userID];
-  const templateVars = { 
+  const templateVars = {
     'user': user,
-    'shortURL': req.params.shortURL, 
+    'shortURL': req.params.shortURL,
     'longURL': urlDatabase[req.params.shortURL]
   };
   res.render("urls_show", templateVars);
@@ -80,13 +92,17 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/register", (req, res) => {
   let userID = req.cookies['user_id']
   let user = users[userID];
-  const templateVars = { 
+  const templateVars = {
     'user': user, ///////problem
   };
-//console.log(users[req.body.id])
+  //console.log(users[req.body.id])
   res.render('urls_register', templateVars)
 })
 
+app.get("/login", (req, res) => {
+
+  res.render('urls_login')
+})
 
 
 
@@ -105,7 +121,7 @@ app.post("/urls", (req, res) => {
 
 
 //Delete
-app.post('/urls/:shortURL/delete', (req, res) => { 
+app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
   res.redirect('/urls');
@@ -118,12 +134,29 @@ app.post('/urls/:shortURL', (req, res) => {
   res.redirect('/urls');
 })
 
+const findIdFromEmail = function(email, users) {
+  for( let user in users) {
+    
+  }
+}
+
+
 //login post
 app.post('/login', (req, res) => {
-  let email = req.body.email;
-  let password = req.body.password;
-  res.cookie('user_id', email);
-  res.redirect('/urls');
+  let emailInput = req.body.email;
+  let passwordInput = req.body.password;
+
+  if(checkForEmail(emailInput, users)) {
+    if(passwordInput === users[user].password) {
+      res.cookie('user_id', email);
+      res.redirect('/urls');
+    } else {
+      res.status(403).send('Error 403: Passwords don\'t match.')
+    }
+  } else {
+    res.status(403).send('Error 403: No email found.')
+  }
+  
 })
 
 //logout post
@@ -132,23 +165,30 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 })
 
-//register
-app.post('/register', (req,res) => {
-  
-  if(!req.body.email || !req.body.password){ //If no input
-    console.log("error 404")
-    res.status(404).send('Error 404');
-  } /*else if(){
 
-  } */else {
+
+
+
+//register
+app.post('/register', (req, res) => {
+  let emailInput = req.body.email;
+  let passwordInput = req.body.password;
+
+  if (!emailInput || !passwordInput) { //If no input
+    res.status(400).send('Error 400: Enter email and password.');
+
+  } else if (checkForEmail(emailInput, users)) {
+    res.status(400).send('Error 400: This email already has an account. Log in with the correct password or please use another email.');
+
+  } else {
     const newUserID = generateRandomString();
     users[newUserID] = {
       id: newUserID,
       email: req.body.email,
       password: req.body.password
-  }
-  res.cookie('user_id', newUserID)
-  res.redirect('/urls')
+    }
+    res.cookie('user_id', newUserID)
+    res.redirect('/urls')
   }
 })
 
@@ -160,7 +200,7 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-app.get("/urls.json", (req,res) => {
+app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 })
 

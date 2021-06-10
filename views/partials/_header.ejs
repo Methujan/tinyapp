@@ -16,11 +16,9 @@
           <button type="submit" class="btn btn-primary">Logout</button>
       </form>
     <% } else { %>
-      <form method="POST" action="/login" >
-        <label for="user"> <%= %></label>
-        <input id="user" name="user">
-        <button type="submit" class="btn btn-primary"><b>Login</b></button>
-        </form> 
+      <a class="nav-item nav-link" href="/register" style="color: beige;">Register</a>
+      
+      <a class="nav-item nav-link" href="/login" style="color: beige;">Login</a>
       <% } %>
 
 
