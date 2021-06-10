@@ -22,11 +22,6 @@ const urlDatabase = {
   }
 };
 
-//const urlDatabase = {
-//  "b2xVn2": "http://www.lighthouselabs.ca",
-//  "9sm5xK": "http://www.google.com"
-//};
-
 const users = {
   "userRandomID": {
     id: "userRandomID",
@@ -39,7 +34,6 @@ const users = {
     password: "dishwasher-funk"
   }
 }
-
 
 
 function generateRandomString() {
@@ -61,7 +55,7 @@ const checkForEmail = function(inputEmail, users){
   return false;
   }
 
-  //Finds the ID from given email
+//Finds the ID from given email
 const findIdFromEmail = function(email, users) {
   for( let user in users) {
     if (users[user].email === email) {
@@ -79,30 +73,31 @@ const urlsForUser = function(id) {
   }
   return userUrlDatabase;
 }
+
+
+
+
 //Add get for '/' -> Homepage
 app.get('/', (req, res) => {
-  let userID = req.cookies['user_id']
+  let userID = req.cookies['user_id'];
   if(userID){
-    res.redirect('/urls');
+      res.redirect('/urls');
   } else {
-    res.redirect('/login')
+      res.redirect('/login');
   }
 })
 
 app.get("/urls", (req, res) => {
   let userID = req.cookies['user_id']
-  console.log('userID',userID)
   let user = users[userID];
   let userUrls = urlsForUser(userID);
-  console.log('urlDatabase',urlDatabase);
-  console.log('userUrls',userUrls);
   const templateVars = {
+    'userID': userID,
     'user': user, 
     'urls': urlDatabase,
-    userUrls,
+    'userUrls': userUrls,
   };
-  //console.log('UserObject', user);
-  //console.log('UserDatabase', users);
+  
   if(userID) {
     res.render("urls_index", templateVars);
   } else {
@@ -130,12 +125,21 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   let userID = req.cookies['user_id']
   let user = users[userID];
+  //console.log('userID', userID)
+  //console.log('user', user)
+  //console.log('urlDatabase', urlDatabase )
+  //console.log('shortURL', req.params.shortURL)
+  let userUrls = urlsForUser(userID);
   const templateVars = {
     'user': user,
     'shortURL': req.params.shortURL,
     'longURL': urlDatabase[req.params.shortURL].longURL
   };
-  res.render("urls_show", templateVars);
+  if(userID===urlDatabase[req.params.shortURL].userID){
+    res.render("urls_show", templateVars);
+  } else{
+    res.status(400).send('Error 400: Login or Register to see your own urls.')
+  }
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -169,6 +173,7 @@ app.post("/urls", (req, res) => {
   if (req) {
     const newShortURL = generateRandomString();
     const userID = req.cookies['user_id'];
+
     urlDatabase[newShortURL] = {
       longURL: req.body.longURL,
       userID: userID
@@ -181,15 +186,21 @@ app.post("/urls", (req, res) => {
 //Delete
 app.post('/urls/:shortURL/delete', (req, res) => { // require and use method override, change delete in EJS Template 
   const shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL];
-  res.redirect('/urls');
+  const userID = req.cookies['user_id'];
+  if(userID === urlDatabase[req.params.shortURL].userID) {
+    delete urlDatabase[shortURL];
+    res.redirect('/urls');
+  }
 })
 
 //Update
 app.post('/urls/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL].longURL = req.body.updatedURL;
-  res.redirect('/urls');
+  const userID = req.cookies['user_id'];
+  if(userID === urlDatabase[req.params.shortURL].userID) {
+    urlDatabase[shortURL].longURL = req.body.updatedURL;
+    res.redirect('/urls');
+  }
 })
 
 //login post
