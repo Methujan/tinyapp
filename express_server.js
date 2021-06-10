@@ -4,6 +4,8 @@ const PORT = 8080; // default port 8080
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
+const saltRounds = 10;
+const bcrypt = require('bcryptjs');
 
 app.set("view engine", "ejs");
 app.use(cookieParser());//
@@ -26,12 +28,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: bcrypt.hashSync("purple-monkey-dinosaur", saltRounds)
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: bcrypt.hashSync("dishwasher-funk", saltRounds)
   }
 }
 
@@ -207,9 +209,10 @@ app.post('/urls/:shortURL', (req, res) => {
 app.post('/login', (req, res) => {
   let emailInput = req.body.email;
   let passwordInput = req.body.password;
+
   if (checkForEmail(emailInput, users)) {
     const idOfEmail = findIdFromEmail(emailInput, users)
-    if (passwordInput === users[idOfEmail].password) {
+    if (bcrypt.compareSync(passwordInput, users[idOfEmail].password)) { //passwordInput === users[idOfEmail].password
       res.cookie('user_id', idOfEmail);
       res.redirect('/urls');
     } else {
@@ -224,15 +227,17 @@ app.post('/login', (req, res) => {
 //logout post
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
-  res.redirect('/urls');
+  res.redirect('/');
 })
 
 //register
 app.post('/register', (req, res) => {
   let emailInput = req.body.email;
   let passwordInput = req.body.password;
+  let hashedPassword = bcrypt.hashSync(passwordInput, saltRounds);
 
-  if (!emailInput || !passwordInput) { //If no input
+
+  if (!emailInput || !hashedPassword) { //If no input
     res.status(400).send('Error 400: Enter email and password.');
 
   } else if (checkForEmail(emailInput, users)) {
@@ -243,7 +248,7 @@ app.post('/register', (req, res) => {
     users[newUserID] = {
       id: newUserID,
       email: req.body.email,
-      password: req.body.password
+      password: hashedPassword
     }
     console.log(users);
     res.cookie('user_id', newUserID)
