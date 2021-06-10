@@ -56,7 +56,7 @@ app.get("/urls", (req, res) => {
   let userID = req.cookies['user_id']
   let user = users[userID];
   const templateVars = {
-    'user': user, ///////problem
+    'user': user, 
     'urls': urlDatabase
   };
   console.log('UserObject', user);
@@ -64,11 +64,14 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 })
 
+
+//If someone isn't logged in, redirect them to the login page
+//res.redirect("/login")
 app.get("/urls/new", (req, res) => {
   let userID = req.cookies['user_id']
   let user = users[userID];
   const templateVars = {
-    'user': user, ///////problem
+    'user': user,
   };
   res.render("urls_new", templateVars);
 });
@@ -93,9 +96,9 @@ app.get("/register", (req, res) => {
   let userID = req.cookies['user_id']
   let user = users[userID];
   const templateVars = {
-    'user': user, ///////problem
+    'user': user, 
   };
-  //console.log(users[req.body.id])
+ 
   res.render('urls_register', templateVars)
 })
 
@@ -119,7 +122,6 @@ app.post("/urls", (req, res) => {
     }
     res.redirect('/urls/' + newShortURL);
   }
-  //console.log(req.body);  // Log the POST request body to the console
   res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
@@ -151,10 +153,6 @@ const findIdFromEmail = function(email, users) {
 app.post('/login', (req, res) => {
   let emailInput = req.body.email;
   let passwordInput = req.body.password;
-
-  //console.log("req.body:",(req.body.password));
-  //console.log("emailinput:",(emailInput));
-  //console.log(checkForEmail(emailInput, users));
   if(checkForEmail(emailInput, users)) {
     const idOfEmail = findIdFromEmail(emailInput, users)
     if(passwordInput === users[idOfEmail].password) {
