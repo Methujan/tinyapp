@@ -41,38 +41,40 @@ const users = {
     password: bcrypt.hashSync("dishwasher-funk", saltRounds)
   }
 }
-const {getUserByEmail} = require('./helpers') 
+const {getUserByEmail, generateRandomString, checkForEmail, findIdFromEmail, urlsForUser} = require('./helpers') 
 
-function generateRandomString() {
+/*
+const generateRandomString = function() {
   randomString = '';
   let characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
   for (let i = 0; i < 6; i++) {
     randomString += characters.charAt(Math.floor(Math.random() * 62));
   }
   return randomString;
-}
+}*/
 
 //Callback function to check if email has already been register
-const checkForEmail = function(inputEmail, users){
+/*const checkForEmail = function(inputEmail, users){
   for(user in users){
     if(users[user].email === inputEmail){
       return true;
     }
   }
   return false;
-  }
+  }*/
 
 //Finds the ID from given email
+/*
 const findIdFromEmail = function(email, users) {
   for( let user in users) {
     if (users[user].email === email) {
       return users[user].id;
     }
   }
-}
+}*/
 
-
-const urlsForUser = function(id) {
+/*
+const urlsForUser = function(id, urlDatabase) {
   let userUrlDatabase = {};
   for(let url in urlDatabase) {
     if (urlDatabase[url].userID === id) {
@@ -81,7 +83,7 @@ const urlsForUser = function(id) {
   }
   return userUrlDatabase;
 }
-
+*/
 
 
 
@@ -100,7 +102,7 @@ app.get("/urls", (req, res) => {
   let userID = req.session.user_id
   //let userID = req.cookies['user_id']
   let user = users[userID];
-  let userUrls = urlsForUser(userID);
+  let userUrls = urlsForUser(userID, urlDatabase);
   const templateVars = {
     'userID': userID,
     'user': user, 
@@ -135,7 +137,7 @@ app.get("/urls/:shortURL", (req, res) => {
   let userID = req.session.user_id
   //let userID = req.cookies['user_id']
   let user = users[userID];
-  let userUrls = urlsForUser(userID);
+  let userUrls = urlsForUser(userID, urlDatabase);
   const templateVars = {
     'user': user,
     'shortURL': req.params.shortURL,
@@ -189,7 +191,7 @@ app.post("/urls", (req, res) => {
     }
     res.redirect('/urls/' + newShortURL);
   }
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  //res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
 //Delete
