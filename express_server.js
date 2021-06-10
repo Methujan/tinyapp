@@ -80,6 +80,14 @@ const urlsForUser = function(id) {
   return userUrlDatabase;
 }
 //Add get for '/' -> Homepage
+app.get('/', (req, res) => {
+  let userID = req.cookies['user_id']
+  if(userID){
+    res.redirect('/urls');
+  } else {
+    res.redirect('/login')
+  }
+})
 
 app.get("/urls", (req, res) => {
   let userID = req.cookies['user_id']
