@@ -24,7 +24,7 @@ describe('getUserByEmail', function() {
 
   it('should return a length of 6 for the randomized string', function() {
     const actual = generateRandomString()
-    const expectedOutput = 6;
+    const expectedOutput = 6; 
     assert.equal(actual.length, expectedOutput)
   });
   
