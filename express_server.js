@@ -246,8 +246,6 @@ app.post('/register', (req, res) => {
   }
 })
 
-console.log(urlDatabase);
-
 
 
 
