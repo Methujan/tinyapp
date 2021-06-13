@@ -195,7 +195,13 @@ app.post('/login', (req, res) => {
   let emailInput = req.body.email;
   let passwordInput = req.body.password;
 
-  if (checkForEmail(emailInput, users)) {
+  if(!passwordInput && !emailInput) {
+    res.status(400).send('Error: Empty inputs. Enter your email and password.');
+  } else if(!passwordInput) {
+    res.status(400).send('Error: Empty password. Please enter your password.');
+  } else if (!emailInput) {
+    res.status(400).send('Error: Empty email. Please enter your email');
+  } else if (checkForEmail(emailInput, users)) {
     const idOfEmail = findIdFromEmail(emailInput, users);
     if (bcrypt.compareSync(passwordInput, users[idOfEmail].password)) {
       req.session.user_id = idOfEmail;
