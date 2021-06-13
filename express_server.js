@@ -91,6 +91,7 @@ app.get("/urls/:shortURL", (req, res) => {
   let userID = req.session.user_id;
   let user = users[userID];
   let userUrls = urlsForUser(userID, urlDatabase);
+  if(urlDatabase[req.params.shortURL]) {
   const templateVars = {
     'user': user,
     'shortURL': req.params.shortURL,
@@ -99,8 +100,11 @@ app.get("/urls/:shortURL", (req, res) => {
   if (userID === urlDatabase[req.params.shortURL].userID) {
     res.render("urls_show", templateVars);
   } else {
-    res.status(403).send('Error: Login or Register to see your own urls.');
+    res.status(403).send('Error: Don\'t have access to edit this site.');
   }
+}else {
+  res.status(403).send('Error: Short URL does not exist.');
+}
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -155,7 +159,11 @@ app.post("/urls", (req, res) => {
       longURL: req.body.longURL,
       userID: userID
     }
-    res.redirect('/urls/' + newShortURL);
+    if(userID){
+      res.redirect('/urls/' + newShortURL);
+    } else {
+      res.status(403).send('Error: Login to create a new URL.');
+    }
   }
 });
 
@@ -166,6 +174,8 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   if (userID === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[shortURL];
     res.redirect('/urls');
+  } else {
+    res.status(403).send('Error: Don\'t have access to delete.');
   }
 })
 
@@ -176,6 +186,8 @@ app.post('/urls/:shortURL', (req, res) => {
   if (userID === urlDatabase[req.params.shortURL].userID) {
     urlDatabase[shortURL].longURL = req.body.updatedURL;
     res.redirect('/urls');
+  } else {
+    res.status(403).send('Error: Don\'t have access to edit.');
   }
 })
 
@@ -208,11 +220,16 @@ app.post('/register', (req, res) => {
   let hashedPassword = bcrypt.hashSync(passwordInput, saltRounds);
   const newUserID = generateRandomString();
 
-  if (!emailInput || !hashedPassword) {
-    res.status(400).send('Error: Enter email and password.');
+  if(!passwordInput && !emailInput) {
+    res.status(400).send('Error: Empty inputs. Enter email and password.');
+  } else if(!passwordInput) {
+    res.status(400).send('Error: Empty password. Please enter a password.');
+  } else if (!emailInput) {
+    res.status(400).send('Error: Empty email. Please enter an email');
   } else if (checkForEmail(emailInput, users)) {
     res.status(409).send('Error: This email already has an account. Log in with the correct password or please use another email.');
-  } else {
+  }
+    else {
       users[newUserID] = {
         id: newUserID,
         email: req.body.email,
@@ -223,7 +240,7 @@ app.post('/register', (req, res) => {
   }
 })
 
-
+console.log(urlDatabase);
 
 
 
