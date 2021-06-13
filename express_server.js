@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
 const saltRounds = 10;
@@ -105,8 +104,16 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(longURL);
+  
+  if(urlDatabase[req.params.shortURL]) {
+    const longURL = urlDatabase[req.params.shortURL].longURL;
+    if(longURL === undefined) {
+      res.status(404).send('Error: URL does not exist.');
+    }
+    res.redirect(urlDatabase[req.params.shortURL].longURL);
+  } else {
+    res.status(403).send('Error: Short URL does not exist.');
+  }
 });
 
 app.get("/register", (req, res) => {
